@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>portfolio-cockpit</title>
+<style>
+:root { --ink:#1c1a17; --mut:#6f6a61; --faint:#9a948a; --rule:#e3ded5; --bg:#fdfcfa;
+        --pos:#3b6ea5; --neg:#b4550a; --card:#ffffff; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink);
+  font:14px/1.45 ui-sans-serif, system-ui, "Segoe UI", Helvetica, Arial, sans-serif; }
+.wrap { max-width:1280px; margin:0 auto; padding:22px 28px 70px; }
+header { display:flex; align-items:baseline; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+h1 { font-size:19px; margin:0; }
+.sub { color:var(--mut); font-size:12.5px; margin:4px 0 0; }
+.meta { font-size:11px; color:var(--faint); }
+.tabs { display:inline-flex; border:1px solid var(--rule); border-radius:3px; overflow:hidden; }
+.tab { border:0; background:transparent; padding:5px 12px; font-size:11px; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--mut); cursor:pointer; }
+.tab.active { background:#efece6; color:var(--ink); font-weight:600; }
+h2 { font-size:11px; letter-spacing:.1em; text-transform:uppercase; font-weight:700;
+  border-bottom:1px solid var(--ink); padding:16px 0 6px; margin:14px 0 10px; }
+.banners { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-top:16px; }
+.ban { background:var(--card); border:1px solid var(--rule); border-radius:3px; padding:10px 12px; }
+.ban .k { font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--mut); }
+.ban .v { font-size:18px; font-weight:700; margin-top:3px;
+  font-family:ui-monospace,"SF Mono",Consolas,monospace; }
+.ban .d { font-size:11px; color:var(--mut); margin-top:2px; }
+table { width:100%; border-collapse:collapse; }
+th { font-size:10.5px; color:var(--mut); font-weight:600; text-align:right; padding:7px 8px 5px;
+  border-bottom:1px solid var(--rule); white-space:nowrap; cursor:pointer; user-select:none; }
+td { padding:6px 8px; border-bottom:1px solid #f0ece5; font-size:12.5px; text-align:right;
+  font-variant-numeric:tabular-nums; font-family:ui-monospace,"SF Mono",Consolas,monospace; white-space:nowrap; }
+th.l, td.l { text-align:left; } td.l { font-family:inherit; }
+.pos { color:var(--pos); } .neg { color:var(--neg); }
+.pane { display:none; } .pane.active { display:block; }
+.bars .row { display:grid; grid-template-columns:120px 1fr 90px; gap:10px; align-items:center; padding:4px 0; }
+.bars .lbl { font-size:12px; } .bars .amt { font-size:12px; text-align:right;
+  font-family:ui-monospace,monospace; }
+.bar { height:10px; background:#efece6; border-radius:2px; overflow:hidden; }
+.bar i { display:block; height:100%; background:var(--pos); }
+button, .btn { border:1px solid var(--rule); background:#fff; border-radius:3px; font-size:11px;
+  letter-spacing:.04em; padding:5px 11px; cursor:pointer; color:var(--ink); }
+button.primary { background:var(--ink); color:#fff; border-color:var(--ink); }
+button.danger { color:#a03123; }
+input, select, textarea { border:1px solid var(--rule); border-radius:3px; padding:5px 8px;
+  font:12.5px ui-sans-serif,system-ui,sans-serif; background:#fff; color:var(--ink); }
+.form { display:flex; gap:8px; flex-wrap:wrap; align-items:flex-end; margin:10px 0 16px; }
+.form label { display:flex; flex-direction:column; gap:3px; font-size:10px; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--mut); }
+.controls { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:8px 0 12px; }
+.note { font-size:11px; color:var(--faint); margin:10px 0; }
+.priv .money { filter:blur(6px); }
+.tag { font-size:10px; border:1px solid var(--rule); border-radius:3px; padding:1px 6px; color:var(--mut); }
+.chartbox { background:var(--card); border:1px solid var(--rule); border-radius:3px; padding:12px; margin:8px 0; }
+.cal { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-top:8px; }
+.cal .hd { font-size:10px; color:var(--faint); text-align:center; text-transform:uppercase; }
+.cal .day { min-height:44px; border:1px solid var(--rule); border-radius:3px; padding:3px 5px;
+  font-size:10px; color:var(--faint); background:#fff; }
+.cal .day .p { display:block; font-size:10.5px; margin-top:4px;
+  font-family:ui-monospace,monospace; }
+.cal .day.up { background:#eef3f8; } .cal .day.dn { background:#faf1e8; }
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:22px; }
+@media (max-width:900px){ .grid2{grid-template-columns:1fr} .wrap{padding:16px 14px 50px} }
+.rowactions { display:flex; gap:5px; justify-content:flex-end; }
+.rowactions button { padding:2px 7px; font-size:10px; }
+dialog { border:1px solid var(--rule); border-radius:4px; padding:18px; max-width:520px; }
+dialog::backdrop { background:rgba(28,26,23,.35); }
+.empty { color:var(--faint); font-size:12px; padding:14px 0; }
+</style></head><body><div class="wrap" id="app">
+<header>
+  <div><h1>portfolio-cockpit</h1>
+  <p class="sub">Positions, journal and PnL across your accounts — all data stays in this browser.</p></div>
+  <div class="meta"><span id="feedstamp">no price feed loaded</span>
+    <span class="tabs" style="margin-left:10px">
+      <button class="tab active" data-p="dash">Dashboard</button>
+      <button class="tab" data-p="positions">Positions</button>
+      <button class="tab" data-p="journal">Journal</button>
+      <button class="tab" data-p="history">History</button>
+      <button class="tab" data-p="settings">Settings</button>
+    </span></div>
+</header>
+
+<div class="pane active" id="p-dash">
+  <div class="banners" id="banners"></div>
+  <div class="grid2">
+    <div><h2>Exposure by theme</h2><div class="bars" id="themebars"></div></div>
+    <div><h2>Exposure by account</h2><div class="bars" id="acctbars"></div></div>
+  </div>
+  <p class="note" id="dashnote"></p>
+</div>
+
+<div class="pane" id="p-positions">
+  <h2>Open positions</h2>
+  <div class="controls">
+    <select id="posacct"><option value="">All accounts</option></select>
+    <select id="posclass"><option value="">All classes</option>
+      <option value="stock">Stocks</option><option value="crypto">Crypto</option></select>
+    <button id="refreshfeed">Refresh prices</button>
+  </div>
+  <table id="postable"></table>
+  <p class="note">Prices come from your screener feed. For symbols outside the feed, set a manual price with the ✎ button.</p>
+</div>
+
+<div class="pane" id="p-journal">
+  <h2>Add entry</h2>
+  <div class="form" id="tradeform">
+    <label>Type<select id="f-side">
+      <option value="buy">Buy</option><option value="sell">Sell</option>
+      <option value="deposit">Deposit</option><option value="withdraw">Withdraw</option></select></label>
+    <label>Date<input type="date" id="f-date"></label>
+    <label>Account<select id="f-acct"></select></label>
+    <label id="l-class">Class<select id="f-class">
+      <option value="stock">Stock</option><option value="crypto">Crypto</option></select></label>
+    <label id="l-sym">Symbol<input id="f-sym" size="7" placeholder="NVDA"></label>
+    <label id="l-qty">Quantity<input id="f-qty" size="9" inputmode="decimal"></label>
+    <label id="l-price">Price<input id="f-price" size="9" inputmode="decimal"></label>
+    <label id="l-amt" style="display:none">Amount<input id="f-amt" size="10" inputmode="decimal"></label>
+    <label>Fees<input id="f-fees" size="6" inputmode="decimal" value="0"></label>
+    <label id="l-theme">Theme<select id="f-theme"></select></label>
+    <label style="flex:1;min-width:160px">Notes<input id="f-notes"></label>
+    <button class="primary" id="f-add">Add</button>
+  </div>
+  <h2>Journal</h2>
+  <div class="controls">
+    <select id="jacct"><option value="">All accounts</option></select>
+    <select id="jside"><option value="">All types</option><option>buy</option><option>sell</option>
+      <option>deposit</option><option>withdraw</option></select>
+    <input id="jsearch" placeholder="search symbol / notes" size="18">
+  </div>
+  <table id="jtable"></table>
+</div>
+
+<div class="pane" id="p-history">
+  <h2>Equity snapshots</h2>
+  <div class="controls">
+    <button class="primary" id="snapnow">Snapshot now</button>
+    <span class="note" id="snapnote" style="margin:0"></span>
+  </div>
+  <div class="chartbox">
+    <div class="controls" style="margin:0 0 6px">
+      <button id="chartmode" data-m="pct">show in $</button>
+      <label style="font-size:11px;color:var(--mut)"><input type="checkbox" id="benchspy" checked> vs SPY</label>
+      <label style="font-size:11px;color:var(--mut)"><input type="checkbox" id="benchbtc"> vs BTC</label>
+    </div>
+    <div id="chart"></div>
+  </div>
+  <div class="grid2">
+    <div><h2>Snapshot table</h2><table id="snaptable"></table></div>
+    <div><h2>PnL calendar</h2>
+      <div class="controls" style="margin:4px 0">
+        <button id="calprev">‹</button><span id="callabel" style="font-size:12px"></span><button id="calnext">›</button>
+      </div>
+      <div class="cal" id="cal"></div>
+      <p class="note">Daily PnL = change in total equity between snapshots, minus deposits plus withdrawals in between. Snapshot at least once a day for a complete calendar.</p>
+    </div>
+  </div>
+</div>
+
+<div class="pane" id="p-settings">
+  <div class="grid2">
+  <div>
+    <h2>Accounts</h2>
+    <div class="form"><label>New account<input id="newacct" placeholder="e.g. IBKR main"></label>
+      <button id="addacct" class="primary">Add</button></div>
+    <table id="accttable"></table>
+    <h2>Themes</h2>
+    <div class="form"><label>New theme<input id="newtheme" placeholder="e.g. Nuclear"></label>
+      <button id="addtheme" class="primary">Add</button></div>
+    <div id="themelist" class="controls"></div>
+  </div>
+  <div>
+    <h2>Price feed</h2>
+    <div class="form">
+      <label style="flex:1;min-width:240px">Screener prices.json URL
+        <input id="feedurl" placeholder="https://YOUR-USERNAME.github.io/market-screener/prices.json"></label>
+      <button id="savefeed" class="primary">Save & load</button>
+    </div>
+    <h2>Privacy</h2>
+    <div class="controls"><button id="privtoggle">Privacy mode: off</button>
+      <span class="note" style="margin:0">Blurs all money amounts — for screenshots and screen-sharing.</span></div>
+    <h2>Data</h2>
+    <div class="controls">
+      <button id="exportbtn">Export backup</button>
+      <button id="importbtn">Import backup</button>
+      <input type="file" id="importfile" accept=".json" style="display:none">
+      <button id="wipebtn" class="danger">Erase everything</button>
+    </div>
+    <p class="note">Everything lives in this browser's storage. Export a backup regularly — clearing browser data erases the cockpit. The backup file is plain JSON you can move between devices.</p>
+  </div>
+  </div>
+</div>
+</div>
+
+<script>
+"use strict";
+// ---------- state ----------
+const KEY = "cockpit_v1";
+const defState = () => ({
+  accounts: [{id: uid(), name: "Main"}],
+  themes: ["Semis","AI infra","Software","Nuclear","Pharma","Crypto majors","Crypto alts","Other"],
+  trades: [], snapshots: [], manualPrices: {},
+  settings: {feedUrl: "", privacy: false}
+});
+let S;
+try { S = JSON.parse(localStorage.getItem(KEY)) || defState(); }
+catch (e) { S = defState(); }
+let FEED = null; // {updated, prices, benchmarks}
+function save() { localStorage.setItem(KEY, JSON.stringify(S)); }
+function uid() { return Math.random().toString(36).slice(2, 9); }
+
+// ---------- formatting ----------
+const nf2 = new Intl.NumberFormat("en-US", {maximumFractionDigits: 2});
+function money(x) {
+  if (x == null || isNaN(x)) return "—";
+  const s = (x < 0 ? "−$" : "$") + nf2.format(Math.abs(x));
+  return `<span class="money">${s}</span>`;
+}
+function pct(x, signed = true) {
+  if (x == null || isNaN(x)) return "—";
+  const v = x * 100;
+  return (signed && v >= 0.005 ? "+" : "") + v.toFixed(1) + "%";
+}
+function clsOf(x) { return x == null || isNaN(x) ? "" : x >= 0 ? "pos" : "neg"; }
+function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g,
+  c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+// ---------- prices ----------
+function priceOf(sym) {
+  sym = sym.toUpperCase();
+  if (S.manualPrices[sym] != null) return {p: S.manualPrices[sym], src: "manual"};
+  if (FEED && FEED.prices[sym] != null) return {p: FEED.prices[sym], src: "feed"};
+  return {p: null, src: "none"};
+}
+async function loadFeed(quiet) {
+  if (!S.settings.feedUrl) { renderAll(); return; }
+  try {
+    const r = await fetch(S.settings.feedUrl, {cache: "no-store"});
+    FEED = await r.json();
+    document.getElementById("feedstamp").textContent = "prices as of " + FEED.updated;
+  } catch (e) {
+    if (!quiet) alert("Could not load the price feed. Check the URL in Settings, and that your screener has run at least once.");
+  }
+  renderAll();
+}
+
+// ---------- positions ----------
+function positions() {
+  const map = {};
+  for (const t of S.trades) {
+    if (t.side !== "buy" && t.side !== "sell") continue;
+    const k = t.symbol.toUpperCase() + "|" + t.account;
+    map[k] = map[k] || {symbol: t.symbol.toUpperCase(), account: t.account, cls: t.cls,
+                        theme: t.theme || "Other", qty: 0, cost: 0, realized: 0};
+    const p = map[k];
+    if (t.side === "buy") {
+      p.cost += t.qty * t.price + (t.fees || 0);
+      p.qty += t.qty;
+    } else {
+      const avg = p.qty > 0 ? p.cost / p.qty : 0;
+      p.realized += t.qty * (t.price - avg) - (t.fees || 0);
+      p.cost -= avg * t.qty;
+      p.qty -= t.qty;
+    }
+    if (t.theme) p.theme = t.theme;
+  }
+  return Object.values(map);
+}
+function cashOf(acctId) {
+  let c = 0;
+  for (const t of S.trades) {
+    if (t.account !== acctId) continue;
+    if (t.side === "deposit") c += t.amount;
+    else if (t.side === "withdraw") c -= t.amount;
+    else if (t.side === "buy") c -= t.qty * t.price + (t.fees || 0);
+    else if (t.side === "sell") c += t.qty * t.price - (t.fees || 0);
+  }
+  return c;
+}
+function equityBreakdown() {
+  const by = {};
+  for (const a of S.accounts) by[a.id] = {cash: cashOf(a.id), value: 0};
+  for (const p of positions()) {
+    if (p.qty <= 1e-12) continue;
+    const pr = priceOf(p.symbol).p;
+    if (pr != null && by[p.account]) by[p.account].value += p.qty * pr;
+  }
+  let total = 0, cash = 0, value = 0;
+  for (const k in by) { total += by[k].cash + by[k].value; cash += by[k].cash; value += by[k].value; }
+  return {by, total, cash, value};
+}
+
+// ---------- dashboard ----------
+function renderDash() {
+  const eq = equityBreakdown();
+  const pos = positions().filter(p => p.qty > 1e-12);
+  let unreal = 0, realized = 0, priced = 0, unpriced = [];
+  for (const p of pos) {
+    const pr = priceOf(p.symbol).p;
+    realized += p.realized;
+    if (pr == null) { unpriced.push(p.symbol); continue; }
+    unreal += p.qty * pr - p.cost; priced++;
+  }
+  for (const p of positions()) if (p.qty <= 1e-12) realized += p.realized;
+  const last = S.snapshots.length ? S.snapshots[S.snapshots.length - 1] : null;
+  const dayChg = last ? eq.total - last.total - flowsSince(last.date) : null;
+  const b = [];
+  b.push(["Total equity", money(eq.total), ""]);
+  b.push(["Positions value", money(eq.value), pos.length + " open"]);
+  b.push(["Cash", money(eq.cash), S.accounts.length + " accounts"]);
+  b.push(["Unrealized PnL", `<span class="${clsOf(unreal)}">${money(unreal)}</span>`,
+          eq.value ? pct(unreal / (eq.value - unreal)) : ""]);
+  b.push(["Realized PnL", `<span class="${clsOf(realized)}">${money(realized)}</span>`, "all time"]);
+  b.push(["Since last snapshot", dayChg == null ? "—" :
+          `<span class="${clsOf(dayChg)}">${money(dayChg)}</span>`, last ? "vs " + last.date : ""]);
+  document.getElementById("banners").innerHTML = b.map(x =>
+    `<div class="ban"><div class="k">${x[0]}</div><div class="v">${x[1]}</div><div class="d">${x[2]}</div></div>`).join("");
+
+  const themes = {}, accts = {};
+  for (const p of pos) {
+    const pr = priceOf(p.symbol).p;
+    if (pr == null) continue;
+    const v = p.qty * pr;
+    themes[p.theme] = (themes[p.theme] || 0) + v;
+    accts[p.account] = (accts[p.account] || 0) + v;
+  }
+  bars("themebars", themes, k => k, eq.value);
+  bars("acctbars", accts, k => (S.accounts.find(a => a.id === k) || {name: "?"}).name, eq.value);
+  document.getElementById("dashnote").textContent = unpriced.length ?
+    "No price for: " + unpriced.join(", ") + " — set manual prices in the Positions tab." : "";
+}
+function bars(el, obj, labelFn, total) {
+  const rows = Object.entries(obj).sort((a, b) => b[1] - a[1]);
+  document.getElementById(el).innerHTML = rows.length ? rows.map(([k, v]) =>
+    `<div class="row"><span class="lbl">${esc(labelFn(k))}</span>
+     <span class="bar"><i style="width:${total ? Math.min(100, v / total * 100) : 0}%"></i></span>
+     <span class="amt">${money(v)} · ${total ? (v / total * 100).toFixed(1) : 0}%</span></div>`).join("")
+    : '<p class="empty">No open positions yet — add trades in the Journal tab.</p>';
+}
+function flowsSince(dateStr) {
+  let f = 0;
+  for (const t of S.trades) {
+    if (t.date > dateStr && (t.side === "deposit" || t.side === "withdraw"))
+      f += t.side === "deposit" ? t.amount : -t.amount;
+  }
+  return f;
+}
+
+// ---------- positions tab ----------
+function renderPositions() {
+  const fa = document.getElementById("posacct").value;
+  const fc = document.getElementById("posclass").value;
+  const eq = equityBreakdown();
+  let pos = positions().filter(p => p.qty > 1e-12);
+  if (fa) pos = pos.filter(p => p.account === fa);
+  if (fc) pos = pos.filter(p => p.cls === fc);
+  const rows = pos.map(p => {
+    const {p: pr, src} = priceOf(p.symbol);
+    const avg = p.cost / p.qty, val = pr != null ? p.qty * pr : null;
+    const upnl = val != null ? val - p.cost : null;
+    const acct = (S.accounts.find(a => a.id === p.account) || {name: "?"}).name;
+    return {p, pr, src, avg, val, upnl, acct};
+  }).sort((a, b) => (b.val || 0) - (a.val || 0));
+  const t = ['<tr><th class="l">symbol</th><th class="l">account</th><th class="l">theme</th>',
+    '<th>qty</th><th>avg cost</th><th>last</th><th>value</th><th>unreal PnL</th><th>%</th><th>weight</th><th></th></tr>'];
+  for (const r of rows) {
+    t.push(`<tr><td class="l"><b>${esc(r.p.symbol)}</b> <span class="tag">${r.p.cls}</span></td>
+      <td class="l">${esc(r.acct)}</td><td class="l">${esc(r.p.theme)}</td>
+      <td>${nf2.format(r.p.qty)}</td><td>${money(r.avg)}</td>
+      <td>${r.pr != null ? money(r.pr) : "—"}${r.src === "manual" ? ' <span class="tag">manual</span>' : ""}</td>
+      <td>${money(r.val)}</td>
+      <td class="${clsOf(r.upnl)}">${money(r.upnl)}</td>
+      <td class="${clsOf(r.upnl)}">${r.upnl != null ? pct(r.upnl / r.p.cost) : "—"}</td>
+      <td>${r.val != null && eq.value ? (r.val / eq.value * 100).toFixed(1) + "%" : "—"}</td>
+      <td class="rowactions"><button onclick="setManual('${r.p.symbol}')">✎ price</button></td></tr>`);
+  }
+  document.getElementById("postable").innerHTML = rows.length ? t.join("") :
+    '<tr><td class="empty l">No open positions match.</td></tr>';
+}
+window.setManual = function(sym) {
+  const cur = S.manualPrices[sym];
+  const v = prompt("Manual price for " + sym + " (leave empty to use the feed):", cur != null ? cur : "");
+  if (v === null) return;
+  if (v.trim() === "") delete S.manualPrices[sym];
+  else { const n = parseFloat(v); if (!isNaN(n)) S.manualPrices[sym] = n; }
+  save(); renderAll();
+};
+
+// ---------- journal ----------
+function sideChanged() {
+  const cashOnly = ["deposit", "withdraw"].includes(document.getElementById("f-side").value);
+  for (const id of ["l-class", "l-sym", "l-qty", "l-price", "l-theme"])
+    document.getElementById(id).style.display = cashOnly ? "none" : "";
+  document.getElementById("l-amt").style.display = cashOnly ? "" : "none";
+}
+function addTrade() {
+  const g = id => document.getElementById(id).value.trim();
+  const side = g("f-side"), date = g("f-date"), acct = g("f-acct");
+  if (!date) return alert("Pick a date.");
+  if (!acct) return alert("Add an account in Settings first.");
+  const t = {id: uid(), side, date, account: acct, fees: parseFloat(g("f-fees")) || 0, notes: g("f-notes")};
+  if (side === "deposit" || side === "withdraw") {
+    t.amount = parseFloat(g("f-amt"));
+    if (isNaN(t.amount) || t.amount <= 0) return alert("Enter an amount.");
+  } else {
+    t.cls = g("f-class"); t.symbol = g("f-sym").toUpperCase();
+    t.qty = parseFloat(g("f-qty")); t.price = parseFloat(g("f-price")); t.theme = g("f-theme");
+    if (!t.symbol) return alert("Enter a symbol.");
+    if (isNaN(t.qty) || t.qty <= 0 || isNaN(t.price) || t.price < 0) return alert("Enter quantity and price.");
+  }
+  S.trades.push(t);
+  S.trades.sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+  save();
+  for (const id of ["f-sym", "f-qty", "f-price", "f-amt", "f-notes"]) document.getElementById(id).value = "";
+  renderAll();
+}
+window.delTrade = function(id) {
+  if (!confirm("Delete this entry?")) return;
+  S.trades = S.trades.filter(t => t.id !== id); save(); renderAll();
+};
+function renderJournal() {
+  const fa = document.getElementById("jacct").value, fs = document.getElementById("jside").value;
+  const q = document.getElementById("jsearch").value.toLowerCase();
+  let rows = S.trades.slice().reverse();
+  if (fa) rows = rows.filter(t => t.account === fa);
+  if (fs) rows = rows.filter(t => t.side === fs);
+  if (q) rows = rows.filter(t => (t.symbol || "").toLowerCase().includes(q) || (t.notes || "").toLowerCase().includes(q));
+  const t = ['<tr><th class="l">date</th><th class="l">type</th><th class="l">account</th><th class="l">symbol</th>',
+    '<th>qty</th><th>price</th><th>fees</th><th>amount</th><th class="l">theme</th><th class="l">notes</th><th></th></tr>'];
+  for (const r of rows) {
+    const acct = (S.accounts.find(a => a.id === r.account) || {name: "?"}).name;
+    const amt = r.side === "deposit" ? r.amount : r.side === "withdraw" ? -r.amount :
+                r.side === "buy" ? -(r.qty * r.price + (r.fees || 0)) : r.qty * r.price - (r.fees || 0);
+    t.push(`<tr><td class="l">${r.date}</td><td class="l">${r.side}</td><td class="l">${esc(acct)}</td>
+      <td class="l"><b>${esc(r.symbol || "—")}</b></td>
+      <td>${r.qty != null ? nf2.format(r.qty) : "—"}</td>
+      <td>${r.price != null ? money(r.price) : "—"}</td>
+      <td>${money(r.fees || 0)}</td>
+      <td class="${clsOf(amt)}">${money(amt)}</td>
+      <td class="l">${esc(r.theme || "—")}</td><td class="l" style="white-space:normal">${esc(r.notes)}</td>
+      <td class="rowactions"><button onclick="delTrade('${r.id}')">✕</button></td></tr>`);
+  }
+  document.getElementById("jtable").innerHTML = rows.length ? t.join("") :
+    '<tr><td class="empty l">No entries yet. Start with a deposit into each account, then add your trades.</td></tr>';
+}
+
+// ---------- history ----------
+function takeSnapshot() {
+  const eq = equityBreakdown();
+  const today = new Date().toISOString().slice(0, 10);
+  const unpricedCount = positions().filter(p => p.qty > 1e-12 && priceOf(p.symbol).p == null).length;
+  if (unpricedCount && !confirm(unpricedCount + " position(s) have no price and will count as 0. Snapshot anyway?")) return;
+  S.snapshots = S.snapshots.filter(s => s.date !== today);
+  const by = {};
+  for (const k in eq.by) by[k] = Math.round((eq.by[k].cash + eq.by[k].value) * 100) / 100;
+  S.snapshots.push({date: today, total: Math.round(eq.total * 100) / 100, by});
+  S.snapshots.sort((a, b) => a.date < b.date ? -1 : 1);
+  save(); renderAll();
+}
+function dailyPnl() {
+  const out = {};
+  for (let i = 1; i < S.snapshots.length; i++) {
+    const a = S.snapshots[i - 1], b = S.snapshots[i];
+    let flows = 0;
+    for (const t of S.trades)
+      if (t.date > a.date && t.date <= b.date)
+        flows += t.side === "deposit" ? t.amount : t.side === "withdraw" ? -t.amount : 0;
+    out[b.date] = b.total - a.total - flows;
+  }
+  return out;
+}
+function renderSnaps() {
+  const pnl = dailyPnl();
+  const t = ['<tr><th class="l">date</th><th>total equity</th><th>PnL vs prior</th><th></th></tr>'];
+  for (const s of S.snapshots.slice().reverse()) {
+    const p = pnl[s.date];
+    t.push(`<tr><td class="l">${s.date}</td><td>${money(s.total)}</td>
+      <td class="${clsOf(p)}">${p != null ? money(p) : "—"}</td>
+      <td class="rowactions"><button onclick="delSnap('${s.date}')">✕</button></td></tr>`);
+  }
+  document.getElementById("snaptable").innerHTML = S.snapshots.length ? t.join("") :
+    '<tr><td class="empty l">No snapshots yet — press "Snapshot now" once you have positions.</td></tr>';
+  const last = S.snapshots[S.snapshots.length - 1];
+  document.getElementById("snapnote").textContent = last ?
+    "Last snapshot: " + last.date : "Take one snapshot per day to build your history.";
+}
+window.delSnap = function(d) {
+  if (!confirm("Delete snapshot " + d + "?")) return;
+  S.snapshots = S.snapshots.filter(s => s.date !== d); save(); renderAll();
+};
+function renderChart() {
+  const el = document.getElementById("chart");
+  if (S.snapshots.length < 2) { el.innerHTML = '<p class="empty">The chart appears after two or more snapshots.</p>'; return; }
+  const mode = document.getElementById("chartmode").dataset.m;
+  const W = el.clientWidth || 560, H = 190, padL = 46, padR = 8, padT = 10, padB = 22;
+  const snaps = S.snapshots;
+  const dates = snaps.map(s => s.date);
+  // equity series: $ or cumulative % (flow-adjusted)
+  let series;
+  if (mode === "usd") series = snaps.map(s => s.total);
+  else {
+    const pnl = dailyPnl(); let cum = 0; series = [0];
+    for (let i = 1; i < snaps.length; i++) {
+      const base = snaps[i - 1].total || 1;
+      cum = (1 + cum) * (1 + (pnl[snaps[i].date] || 0) / base) - 1;
+      series.push(cum * 100);
+    }
+  }
+  const lines = [{name: "You", pts: series, color: "var(--ink)", w: 1.8}];
+  if (mode === "pct" && FEED) for (const [bname, on] of [["SPY", "benchspy"], ["BTC", "benchbtc"]]) {
+    if (!document.getElementById(on).checked || !FEED.benchmarks[bname]) continue;
+    const hist = Object.fromEntries(FEED.benchmarks[bname]);
+    const px = dates.map(d => { // last close on or before d
+      let best = null;
+      for (const [bd, c] of FEED.benchmarks[bname]) if (bd <= d) best = c;
+      return best;
+    });
+    if (px[0] == null) continue;
+    lines.push({name: bname, pts: px.map(v => v == null ? null : (v / px[0] - 1) * 100),
+                color: bname === "SPY" ? "var(--pos)" : "var(--neg)", w: 1.2});
+  }
+  const all = lines.flatMap(l => l.pts).filter(v => v != null);
+  let lo = Math.min(...all), hi = Math.max(...all);
+  if (hi - lo < 1e-9) { hi += 1; lo -= 1; }
+  const X = i => padL + i * (W - padL - padR) / (dates.length - 1);
+  const Y = v => padT + (hi - v) * (H - padT - padB) / (hi - lo);
+  let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}">`;
+  for (const g of [lo, (lo + hi) / 2, hi]) {
+    svg += `<line x1="${padL}" y1="${Y(g)}" x2="${W - padR}" y2="${Y(g)}" stroke="#eee8de" stroke-width="1"/>`;
+    svg += `<text x="${padL - 6}" y="${Y(g) + 3}" text-anchor="end" font-size="9" fill="#9a948a">` +
+           (mode === "usd" ? "$" + nf2.format(g) : g.toFixed(1) + "%") + `</text>`;
+  }
+  for (const l of lines) {
+    const d = l.pts.map((v, i) => v == null ? null : `${X(i)},${Y(v)}`).filter(Boolean).join(" ");
+    svg += `<polyline points="${d}" fill="none" stroke="${l.color}" stroke-width="${l.w}"/>`;
+  }
+  svg += `<text x="${padL}" y="${H - 6}" font-size="9" fill="#9a948a">${dates[0]}</text>`;
+  svg += `<text x="${W - padR}" y="${H - 6}" text-anchor="end" font-size="9" fill="#9a948a">${dates[dates.length - 1]}</text>`;
+  let lx = padL + 4;
+  for (const l of lines) {
+    svg += `<rect x="${lx}" y="${padT}" width="8" height="3" fill="${l.color}"/>` +
+           `<text x="${lx + 12}" y="${padT + 4}" font-size="9" fill="#6f6a61">${l.name}</text>`;
+    lx += 50;
+  }
+  svg += "</svg>";
+  el.innerHTML = svg;
+  const modeClass = mode === "usd" ? "money-chart" : "";
+  el.querySelectorAll("text").forEach(t => { if (mode === "usd" && t.textContent.startsWith("$")) t.classList.add("money"); });
+}
+let calCursor = new Date();
+function renderCal() {
+  const y = calCursor.getFullYear(), m = calCursor.getMonth();
+  document.getElementById("callabel").textContent =
+    calCursor.toLocaleString("en", {month: "long", year: "numeric"});
+  const pnl = dailyPnl();
+  const first = new Date(y, m, 1), start = (first.getDay() + 6) % 7; // Monday first
+  const days = new Date(y, m + 1, 0).getDate();
+  let h = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].map(d => `<div class="hd">${d}</div>`).join("");
+  for (let i = 0; i < start; i++) h += "<div></div>";
+  for (let d = 1; d <= days; d++) {
+    const ds = `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    const p = pnl[ds];
+    const c = p == null ? "" : p >= 0 ? "up" : "dn";
+    h += `<div class="day ${c}">${d}${p != null ?
+      `<span class="p ${clsOf(p)}">${money(p)}</span>` : ""}</div>`;
+  }
+  document.getElementById("cal").innerHTML = h;
+}
+
+// ---------- settings ----------
+function renderSettings() {
+  const t = ['<tr><th class="l">account</th><th>cash</th><th>equity</th><th></th></tr>'];
+  const eq = equityBreakdown();
+  for (const a of S.accounts) {
+    const e = eq.by[a.id] || {cash: 0, value: 0};
+    t.push(`<tr><td class="l">${esc(a.name)}</td><td>${money(e.cash)}</td>
+      <td>${money(e.cash + e.value)}</td>
+      <td class="rowactions"><button onclick="renameAcct('${a.id}')">rename</button>
+      <button class="danger" onclick="delAcct('${a.id}')">✕</button></td></tr>`);
+  }
+  document.getElementById("accttable").innerHTML = t.join("");
+  document.getElementById("themelist").innerHTML = S.themes.map(th =>
+    `<span class="tag">${esc(th)} <a href="#" onclick="delTheme('${esc(th)}');return false" style="color:#a03123;text-decoration:none">✕</a></span>`).join(" ");
+  document.getElementById("feedurl").value = S.settings.feedUrl || "";
+  document.getElementById("privtoggle").textContent = "Privacy mode: " + (S.settings.privacy ? "on" : "off");
+  document.body.classList.toggle("priv", !!S.settings.privacy);
+}
+window.renameAcct = function(id) {
+  const a = S.accounts.find(x => x.id === id);
+  const v = prompt("Account name:", a.name);
+  if (v && v.trim()) { a.name = v.trim(); save(); renderAll(); }
+};
+window.delAcct = function(id) {
+  if (S.trades.some(t => t.account === id))
+    return alert("This account has journal entries. Delete those first.");
+  if (S.accounts.length === 1) return alert("Keep at least one account.");
+  if (!confirm("Delete this account?")) return;
+  S.accounts = S.accounts.filter(a => a.id !== id); save(); renderAll();
+};
+window.delTheme = function(th) {
+  S.themes = S.themes.filter(x => x !== th); save(); renderAll();
+};
+
+// ---------- selects ----------
+function fillSelects() {
+  const opts = S.accounts.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join("");
+  document.getElementById("f-acct").innerHTML = opts;
+  document.getElementById("posacct").innerHTML = '<option value="">All accounts</option>' + opts;
+  document.getElementById("jacct").innerHTML = '<option value="">All accounts</option>' + opts;
+  document.getElementById("f-theme").innerHTML = S.themes.map(t => `<option>${esc(t)}</option>`).join("");
+}
+
+// ---------- wiring ----------
+function renderAll() {
+  fillSelects(); renderDash(); renderPositions(); renderJournal();
+  renderSnaps(); renderChart(); renderCal(); renderSettings();
+}
+document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => {
+  document.querySelectorAll(".tab").forEach(x => x.classList.toggle("active", x === t));
+  document.querySelectorAll(".pane").forEach(p => p.classList.toggle("active", p.id === "p-" + t.dataset.p));
+  renderChart();
+}));
+document.getElementById("f-side").addEventListener("change", sideChanged);
+document.getElementById("f-add").addEventListener("click", addTrade);
+document.getElementById("f-date").value = new Date().toISOString().slice(0, 10);
+for (const id of ["posacct", "posclass"]) document.getElementById(id).addEventListener("change", renderPositions);
+for (const id of ["jacct", "jside"]) document.getElementById(id).addEventListener("change", renderJournal);
+document.getElementById("jsearch").addEventListener("input", renderJournal);
+document.getElementById("refreshfeed").addEventListener("click", () => loadFeed(false));
+document.getElementById("snapnow").addEventListener("click", takeSnapshot);
+document.getElementById("chartmode").addEventListener("click", e => {
+  const b = e.target; b.dataset.m = b.dataset.m === "pct" ? "usd" : "pct";
+  b.textContent = b.dataset.m === "pct" ? "show in $" : "show in %"; renderChart();
+});
+for (const id of ["benchspy", "benchbtc"]) document.getElementById(id).addEventListener("change", renderChart);
+document.getElementById("calprev").addEventListener("click", () => { calCursor.setMonth(calCursor.getMonth() - 1); renderCal(); });
+document.getElementById("calnext").addEventListener("click", () => { calCursor.setMonth(calCursor.getMonth() + 1); renderCal(); });
+document.getElementById("addacct").addEventListener("click", () => {
+  const v = document.getElementById("newacct").value.trim();
+  if (!v) return;
+  S.accounts.push({id: uid(), name: v});
+  document.getElementById("newacct").value = ""; save(); renderAll();
+});
+document.getElementById("addtheme").addEventListener("click", () => {
+  const v = document.getElementById("newtheme").value.trim();
+  if (v && !S.themes.includes(v)) S.themes.push(v);
+  document.getElementById("newtheme").value = ""; save(); renderAll();
+});
+document.getElementById("savefeed").addEventListener("click", () => {
+  S.settings.feedUrl = document.getElementById("feedurl").value.trim(); save(); loadFeed(false);
+});
+document.getElementById("privtoggle").addEventListener("click", () => {
+  S.settings.privacy = !S.settings.privacy; save(); renderSettings();
+});
+document.getElementById("exportbtn").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify(S, null, 1)], {type: "application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "cockpit-backup-" + new Date().toISOString().slice(0, 10) + ".json";
+  a.click();
+});
+document.getElementById("importbtn").addEventListener("click", () => document.getElementById("importfile").click());
+document.getElementById("importfile").addEventListener("change", e => {
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const d = JSON.parse(r.result);
+      if (!d.accounts || !d.trades) throw new Error("bad file");
+      if (!confirm("Replace everything with this backup?")) return;
+      S = d; save(); renderAll(); loadFeed(true);
+    } catch (err) { alert("That file doesn't look like a cockpit backup."); }
+  };
+  r.readAsText(f);
+});
+document.getElementById("wipebtn").addEventListener("click", () => {
+  if (!confirm("Erase ALL cockpit data from this browser? Export a backup first.")) return;
+  if (!confirm("Really erase everything?")) return;
+  S = defState(); save(); renderAll();
+});
+sideChanged(); renderAll(); loadFeed(true);
+</script></body></html>

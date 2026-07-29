@@ -1,0 +1,38 @@
+# Commodities - TICKER | Name | Group | CFTC COT code (optional, powers positioning data)
+
+# ---- Energy ----
+CL=F | WTI Crude Oil | Energy | 067651
+BZ=F | Brent Crude | Energy |
+NG=F | Natural Gas | Energy | 023651
+RB=F | Gasoline | Energy | 111659
+HO=F | Heating Oil | Energy | 022651
+
+# ---- Metals ----
+GC=F | Gold | Metals | 088691
+SI=F | Silver | Metals | 084691
+PL=F | Platinum | Metals | 076651
+PA=F | Palladium | Metals | 075651
+HG=F | Copper | Metals | 085692
+
+# ---- Grains & oilseeds ----
+ZC=F | Corn | Grains | 002602
+ZS=F | Soybeans | Grains | 005602
+ZW=F | Wheat (Chicago) | Grains | 001602
+KE=F | Wheat (Kansas) | Grains | 001612
+ZM=F | Soybean Meal | Grains | 026603
+ZL=F | Soybean Oil | Grains | 007601
+ZO=F | Oats | Grains | 004603
+ZR=F | Rough Rice | Grains | 039601
+
+# ---- Softs ----
+CC=F | Cocoa | Softs | 073732
+KC=F | Coffee | Softs | 083731
+SB=F | Sugar | Softs | 080732
+CT=F | Cotton | Softs | 033661
+OJ=F | Orange Juice | Softs | 040701
+LBR=F | Lumber | Softs |
+
+# ---- Livestock ----
+LE=F | Live Cattle | Livestock | 057642
+GF=F | Feeder Cattle | Livestock | 061641
+HE=F | Lean Hogs | Livestock | 054642

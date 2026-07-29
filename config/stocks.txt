@@ -1,0 +1,105 @@
+# Your stock universe - edit freely, one per line:  TICKER | Name | Theme
+# Lines starting with # are ignored. Save the file and the next update picks it up.
+
+# ---- Semiconductors & equipment ----
+NVDA | NVIDIA | Semis
+AMD | AMD | Semis
+AVGO | Broadcom | Semis
+TSM | TSMC | Semis
+ASML | ASML | Semis
+AMAT | Applied Materials | Semis
+LRCX | Lam Research | Semis
+KLAC | KLA | Semis
+MU | Micron | Semis
+INTC | Intel | Semis
+QCOM | Qualcomm | Semis
+TXN | Texas Instruments | Semis
+ADI | Analog Devices | Semis
+MRVL | Marvell | Semis
+ARM | Arm Holdings | Semis
+NXPI | NXP | Semis
+ON | ON Semiconductor | Semis
+MCHP | Microchip | Semis
+TER | Teradyne | Semis
+ENTG | Entegris | Semis
+MPWR | Monolithic Power | Semis
+SNPS | Synopsys | Semis
+CDNS | Cadence | Semis
+COHR | Coherent | Semis
+CRDO | Credo | Semis
+ALAB | Astera Labs | Semis
+
+# ---- AI infrastructure, cloud & platforms ----
+MSFT | Microsoft | AI infra
+GOOGL | Alphabet | AI infra
+AMZN | Amazon | AI infra
+META | Meta | AI infra
+AAPL | Apple | AI infra
+ORCL | Oracle | AI infra
+TSLA | Tesla | AI infra
+PLTR | Palantir | AI infra
+CRWV | CoreWeave | AI infra
+NBIS | Nebius | AI infra
+IREN | IREN | AI infra
+APLD | Applied Digital | AI infra
+DELL | Dell | AI infra
+HPE | HPE | AI infra
+ANET | Arista Networks | AI infra
+CIEN | Ciena | AI infra
+VRT | Vertiv | AI infra
+ETN | Eaton | AI infra
+SMCI | Supermicro | AI infra
+STX | Seagate | AI infra
+WDC | Western Digital | AI infra
+EQIX | Equinix | AI infra
+DLR | Digital Realty | AI infra
+IBM | IBM | AI infra
+NOW | ServiceNow | Software
+SNOW | Snowflake | Software
+DDOG | Datadog | Software
+NET | Cloudflare | Software
+CRM | Salesforce | Software
+ADBE | Adobe | Software
+PANW | Palo Alto | Software
+CRWD | CrowdStrike | Software
+
+# ---- Nuclear & power ----
+CEG | Constellation Energy | Nuclear
+VST | Vistra | Nuclear
+TLN | Talen Energy | Nuclear
+NRG | NRG Energy | Nuclear
+GEV | GE Vernova | Nuclear
+OKLO | Oklo | Nuclear
+SMR | NuScale | Nuclear
+NNE | Nano Nuclear | Nuclear
+BWXT | BWX Technologies | Nuclear
+LEU | Centrus Energy | Nuclear
+CCJ | Cameco | Nuclear
+UEC | Uranium Energy | Nuclear
+UUUU | Energy Fuels | Nuclear
+DNN | Denison Mines | Nuclear
+NXE | NexGen Energy | Nuclear
+
+# ---- Pharma & biotech ----
+LLY | Eli Lilly | Pharma
+NVO | Novo Nordisk | Pharma
+JNJ | Johnson & Johnson | Pharma
+MRK | Merck | Pharma
+PFE | Pfizer | Pharma
+ABBV | AbbVie | Pharma
+AMGN | Amgen | Pharma
+GILD | Gilead | Pharma
+REGN | Regeneron | Pharma
+VRTX | Vertex | Pharma
+BMY | Bristol-Myers | Pharma
+AZN | AstraZeneca | Pharma
+NVS | Novartis | Pharma
+MRNA | Moderna | Pharma
+BIIB | Biogen | Pharma
+BNTX | BioNTech | Pharma
+ALNY | Alnylam | Pharma
+ISRG | Intuitive Surgical | Pharma
+TMO | Thermo Fisher | Pharma
+
+# ---- Benchmark (leave in place) ----
+SPY | S&P 500 (benchmark) | Benchmark
