@@ -1,0 +1,43 @@
+name: update screener
+on:
+  schedule:
+    - cron: '0 4 * * *'
+    - cron: '0 12 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: screener
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build dashboard
+        env:
+          COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
+          COINALYZE_API_KEY: ${{ secrets.COINALYZE_API_KEY }}
+        run: python -m screener.main
+
+      - name: Commit and push
+        run: |
+          mkdir -p docs data
+          git config user.name "screener-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs data
+          git commit -m "update $(date -u +'%Y-%m-%d %H:%M') UTC" || echo "no changes"
+          git push
